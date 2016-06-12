@@ -4,15 +4,14 @@ output: html_document
 ---
   
    
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 5)
-```
+
   
 ## Loading and preprocessing the data
 
 In the code chunk below, we load and process the data
 
-```{r}
+
+```r
 activity_data <- read.csv(file = "./activity.csv")
 ```
   
@@ -20,7 +19,8 @@ activity_data <- read.csv(file = "./activity.csv")
 
 In the code chunk below, we calculate the mean of steps taken per day, and display the information on a histogram.
 
-``` {r}
+
+```r
 steps_per_day <- aggregate(activity_data$steps, by = list(activity_data$date), FUN = sum)
 
 hist(steps_per_day$x, 
@@ -28,23 +28,36 @@ hist(steps_per_day$x,
      xlab = "Steps per day",
      ylab ="Density in %")
 ```
+
+<img src="PA1_template_files/figure-html/unnamed-chunk-2-1.png" width="480" />
   
 We will now calculate the mean of steps taken per day.
-``` {r}
+
+```r
 mean(steps_per_day$x, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
   
 
 And let's have a look at the median of steps taken per day too.
-``` {r}
+
+```r
 median(steps_per_day$x, na.rm = TRUE)
+```
+
+```
+## [1] 10765
 ```
 
   
 ## Average daily activity pattern
 
 We now wish to see the average daily activity pattern: mean number of steps per time interval.
-``` {r}
+
+```r
 average_daily_activity_pattern <- aggregate(activity_data$steps, by = list(activity_data$interval), FUN = mean, na.rm = TRUE)
 
 plot(average_daily_activity_pattern$Group.1,
@@ -53,38 +66,48 @@ plot(average_daily_activity_pattern$Group.1,
      main = "Average daily activity pattern",
      xlab="Time Interval",
      ylab="Average number of steps")
-
-
 ```
 
+<img src="PA1_template_files/figure-html/unnamed-chunk-5-1.png" width="480" />
+
 Let's see in which time interval the number of steps is highest.
-``` {r}
+
+```r
 average_daily_activity_pattern[which.max(average_daily_activity_pattern$x),1]
+```
+
+```
+## [1] 835
 ```
 
 
 ## Imputing missing values
 
 Let's have a look at the number of missing values.
-``` {r}
+
+```r
 sum(is.na(activity_data$steps)) 
-``` 
+```
+
+```
+## [1] 2304
+```
 
 In order to fill in these missing values, we will replace them with the average steps taken per day in the time interval considered.
 
 
-``` {r}
+
+```r
 activity_data2 <- merge(activity_data, average_daily_activity_pattern,by.x ="interval",by.y ="Group.1" )
 names(activity_data2)[4] = "average_steps_time_interval"
 
 activity_data2$steps[is.na(activity_data2$steps)] <-activity_data2$average_steps_time_interval[is.na(activity_data2$steps)]
-
-
-``` 
+```
 
 Now let's have a look again at the histogram of average steps taken per time interval.
 
-``` {r}
+
+```r
 steps_per_day2 <- aggregate(activity_data2$steps, by = list(activity_data2$date), FUN = sum)
 
 hist(steps_per_day2$x, 
@@ -92,16 +115,28 @@ hist(steps_per_day2$x,
      xlab = "Steps per day",
      ylab ="Density in %")
 ```
+
+<img src="PA1_template_files/figure-html/unnamed-chunk-9-1.png" width="480" />
   
 We will now calculate again the mean of steps taken per day.
-``` {r}
+
+```r
 mean(steps_per_day2$x, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 The mean has not changed.  
 
 And let's also have a look again at the median of steps taken per day.
-``` {r}
+
+```r
 median(steps_per_day2$x, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 However the median is now equal to the mean. Which makes sense, because we have added a lot of mean values into the dataset.
 
@@ -110,7 +145,8 @@ However the median is now equal to the mean. Which makes sense, because we have 
 
 
 Now let's see what is the difference in average daily activity pattern between weekdays and weekend.
-``` {r}
+
+```r
 # We create a data frame to classify days of the week between weekdays and weekend days
 day <- c("lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche")
 day_type <- c("weekday","weekday","weekday","weekday","weekday","weekend","weekend")
@@ -135,5 +171,6 @@ ggplot(data = average_daily_activity_pattern2,aes(x=interval,y=steps))+
       facet_grid(day_type ~ .)+
       ggtitle("Average daily activity pattern")+
       ylab("Number of steps")
-
 ```
+
+<img src="PA1_template_files/figure-html/unnamed-chunk-12-1.png" width="480" />
